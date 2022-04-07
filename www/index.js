@@ -2,14 +2,12 @@
 // wasm.greet();
 
 import * as wasm from 'wasm-player'
+import HlsPlayer from './libs/HlsPlayer'
 
-wasm.greet().then(txt => {
-    console.log(11, txt)
-    const pre = document.createElement('pre')
-    pre.style = 'font-size: 12px;'
-    pre.innerText = txt
-    document.body.appendChild(pre)
-}).catch(e => {
-    console.log(12, e)
+const container = document.querySelector('video')
+const player = new HlsPlayer(container, {})
+player.parseM3u8Url('https://bitdash-a.akamaihd.net/content/sintel/hls/playlist.m3u8').then(res => {
+    console.log('player', player);
+    player.playlistInfo()  
 })
 
