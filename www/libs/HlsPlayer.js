@@ -1,4 +1,4 @@
-import { Player as WasmPlayer } from 'wasm-player'
+import { WasmPlayer } from 'wasm-player'
 class HlsPlayer {
   constructor(container, options) {
     options = Object.assign({m3u8Url: ''}, options)
@@ -17,13 +17,15 @@ class HlsPlayer {
     this.options.m3u8Url = m3u8Url
     this.core = await WasmPlayer.new(m3u8Url)
   }
-  playlistInfo() {
+  getPlaylistInfo() {
     if (this.core) {
-      console.info(this.core.get_playlist_info())
+      return this.core.get_playlist_info()
     }
   }
-  play(m3u8Url) {
-
+  play() {
+    if (this.core) {
+      this.core.play()
+    }
   }
 }
 
