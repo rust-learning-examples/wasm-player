@@ -17,9 +17,14 @@ class HlsPlayer {
     this.options.m3u8Url = m3u8Url
     this.core = await WasmPlayer.new(m3u8Url)
   }
-  getPlaylistInfo() {
+  getMasterPlaylistInfo() {
     if (this.core) {
-      return this.core.get_playlist_info()
+      return this.core.get_master_playlist_info()
+    }
+  }
+  getMediaPlaylistInfo() {
+    if (this.core) {
+      return this.core.get_media_playlist_info()
     }
   }
   play() {

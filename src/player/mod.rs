@@ -14,14 +14,16 @@ extern {
 #[derive(Debug)]
 pub struct Player {
   m3u8_url: String,
-  playlist: Option<Playlist>,
+  master_playlist: Option<Playlist>,
+  media_playlist: Option<Playlist>,
 }
 
 impl Player {
   pub fn new(m3u8_url: String) -> Player {
     Player {
       m3u8_url: m3u8_url.clone(),
-      playlist: None,
+      master_playlist: None,
+      media_playlist: None,
     }
   }
   pub fn fetch_playlists(mut player: Player, m3u8_url: String) -> Pin<Box<dyn Future<Output = Result<Player, JsValue>>>> {
@@ -42,6 +44,7 @@ impl Player {
               let base_url = Url::parse(&m3u8_url).unwrap();
               let url = Url::options().base_url(Some(&base_url)).parse(&newest_variant.uri).unwrap();
               debug(&format!("{:?}", url));
+              player.master_playlist = Some(Playlist::MasterPlaylist(pl));
               return Player::fetch_playlists(player, url.as_str().to_owned()).await;
             } else {
               return Err("MasterPlaylist中无播放信息".into())
@@ -49,7 +52,7 @@ impl Player {
           },
           Ok(Playlist::MediaPlaylist(pl)) => {
             debug("get MediaPlaylist");
-            player.playlist = Some(Playlist::MediaPlaylist(pl));
+            player.media_playlist = Some(Playlist::MediaPlaylist(pl));
             Ok(player)
           },
           Err(e) => Err(format!("{:?}", e).into()),
@@ -57,8 +60,12 @@ impl Player {
     })
   }
 
-  pub fn get_playlist_info(&self) -> JsValue {
-    format!("{:#?}", self.playlist).into()
+  pub fn get_master_playlist_info(&self) -> JsValue {
+    format!("{:#?}", self.master_playlist).into()
+  }
+
+  pub fn get_media_playlist_info(&self) -> JsValue {
+    format!("{:#?}", self.media_playlist).into()
   }
 
   pub fn play(&self) -> Result<(), String> {
